@@ -1,4 +1,23 @@
-﻿<!DOCTYPE html>
+﻿﻿@using Newtonsoft.Json
+@{
+    var data = Context.Session.GetString("cart");
+    int countCart = 0;
+    if (data == null)
+    {
+        countCart = 0;
+    }
+    else
+    {
+        var data2 = Context.Session.GetString("cart");
+        List<Cart> dataCart = JsonConvert.DeserializeObject<List<Cart>>(data2);
+        foreach (var item in dataCart)
+        {
+            countCart += item.Quantity;
+        }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -30,6 +49,11 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="ListCart" , style="display:flex">
+                                Cart <img src="~/images/cart.png" width=" 20" !important; height="20" /> @countCart
+                            </a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
