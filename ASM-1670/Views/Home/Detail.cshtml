@@ -44,7 +44,7 @@
     <h2>@Model.Title</h2>
     <p>Description: @Model.Description</p>
     <p>Author: @Model.Author</p>
-    <p>Price: @Model.Price</p>
+    <p>Price: $@Model.Price</p>
 
     <a asp-action="AddCart" asp-route-id="@Model.Id" class="btn btn-primary">Add to Cart</a>
     <a asp-action="ListCart" class="btn btn-success">View Cart</a>

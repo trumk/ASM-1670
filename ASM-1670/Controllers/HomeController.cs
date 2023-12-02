@@ -1,6 +1,9 @@
 ﻿using ASM_1670.Data;
 using ASM_1670.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Diagnostics;
 
@@ -16,23 +19,48 @@ namespace ASM_1670.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(string category)
+        public IActionResult Index(string bookCategory, string searchString)
         {
-            var books = GetAllProducts();
-            ViewBag.Book = books;
-            return View();
+            Debug.WriteLine($"bookCategory: {bookCategory}, searchString: {searchString}");
+            IQueryable<string> catQuery = _db.Book.Select(b => b.Category.Name).Distinct();
+
+            var books = from m in _db.Book select m;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                books = books.Where(s => s.Title.Contains(searchString));
+            }
+
+            if (!String.IsNullOrEmpty(bookCategory))
+            {
+                books = books.Where(s => s.Category.Name == bookCategory);
+            }
+
+            ViewBag.Book = GetAllProducts();
+
+            var categoryVM = new CategoryViewModel
+            {
+                Categories = new SelectList(catQuery.Distinct().ToList()),
+                BookCategory = bookCategory,
+                Books = books.ToList()
+            };
+
+            return View(categoryVM);
         }
 
 
-        public List<Book> GetAllProducts()
+
+        private List<Book> GetAllProducts()
         {
-            return _db.Book.ToList();
+            return _db.Book.Include(b => b.Category).ToList(); 
         }
+
         public Book GetDetailProduct(int id)
         {
             var books = _db.Book.Find(id);
             return books;
         }
+        [Authorize(Roles = "Admin, Customer")]
         public IActionResult AddCart(int id)
         {
             var cart = HttpContext.Session.GetString("cart");
@@ -117,6 +145,7 @@ namespace ASM_1670.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = "Admin, Customer")]
         public IActionResult ListCart()
         {
             var cart = HttpContext.Session.GetString("cart");
