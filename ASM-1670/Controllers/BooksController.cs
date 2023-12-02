@@ -18,7 +18,8 @@ namespace ASM_1670.Controllers
 
         public BooksController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
         {
-            _db = db;
+            this._db = db;
+            this.webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Books
