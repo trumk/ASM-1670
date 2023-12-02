@@ -14,7 +14,12 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddMvc();
 
+builder.Services.AddSession(option =>
+{
+    option.IdleTimeout = TimeSpan.FromSeconds(30);
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,6 +38,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 
