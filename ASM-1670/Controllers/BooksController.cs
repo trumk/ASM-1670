@@ -228,9 +228,5 @@ namespace ASM_1670.Controllers
             }
             return uniqueFileName;
         }
-        private bool BookExists(int id)
-        {
-          return (_db.Book?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
     }
 }
