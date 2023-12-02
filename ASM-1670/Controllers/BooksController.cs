@@ -7,34 +7,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ASM_1670.Data;
 using ASM_1670.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ASM_1670.Controllers
 {
     public class BooksController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _db;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public BooksController(ApplicationDbContext context)
+        public BooksController(ApplicationDbContext db, IWebHostEnvironment webHostEnvironment)
         {
-            _context = context;
+            _db = db;
         }
 
         // GET: Books
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Book.Include(b => b.Category);
+            var applicationDbContext = _db.Book.Include(b => b.Category);
             return View(await applicationDbContext.ToListAsync());
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Book == null)
+            if (id == null || _db.Book == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Book
+            var book = await _db.Book
                 .Include(b => b.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (book == null)
@@ -45,10 +48,11 @@ namespace ASM_1670.Controllers
             return View(book);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Books/Create
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "Id");
+            ViewData["CategoryId"] = new SelectList(_db.Set<Category>(), "Id", "Name");
             return View();
         }
 
@@ -57,32 +61,50 @@ namespace ASM_1670.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Author,Price,CategoryId,Picture")] Book book)
+        public async Task<IActionResult> Create(Book model)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(book);
-                await _context.SaveChangesAsync();
+                string uniqueFileName = UploadedFile(model);
+                Book book = new Book
+                {
+                    Title = model.Title,
+                    Description = model.Description,
+                    Author = model.Author,
+                    Price = model.Price,
+                    CategoryId = model.CategoryId, 
+                    Picture = uniqueFileName,
+                };
+
+                _db.Add(book);
+                await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "Id", book.CategoryId);
-            return View(book);
+            ViewData["CategoryId"] = new SelectList(_db.Set<Category>(), "Id", "Name", model.CategoryId);
+            return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Books/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Book == null)
-            {
-                return NotFound();
-            }
+            var book = _db.Book.Find(id);
 
-            var book = await _context.Book.FindAsync(id);
             if (book == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "Id", book.CategoryId);
+
+            var bookEdit = new Book
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Description = book.Description,
+                Author = book.Author,
+                Price = book.Price,
+                CategoryId = book.CategoryId 
+            };
+            ViewData["CategoryId"] = new SelectList(_db.Set<Category>(), "Id", "Name", book.CategoryId);
             return View(book);
         }
 
@@ -91,46 +113,61 @@ namespace ASM_1670.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Author,Price,CategoryId,Picture")] Book book)
+        public async Task<IActionResult> Edit(int id, Book model)
         {
-            if (id != book.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.Id))
+                    var book = await _db.Book.FindAsync(id);
+
+                    if (book == null)
                     {
                         return NotFound();
                     }
-                    else
+
+                    if (!string.IsNullOrEmpty(book.Picture))
                     {
-                        throw;
+                        var oldImagePath = Path.Combine(webHostEnvironment.WebRootPath, "images", book.Picture);
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
                     }
+
+                    string uniqueFileName = UploadedFile(model);
+
+                    book.Title = model.Title;
+                    book.Description = model.Description;
+                    book.Author = model.Author;
+                    book.Price = model.Price;
+                    book.Picture = uniqueFileName;
+                    book.CategoryId = model.CategoryId;
+
+                    await _db.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in Edit action: {ex.Message}");
+                    return View(model);
+                }
             }
-            ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "Id", book.CategoryId);
-            return View(book);
+            ViewData["CategoryId"] = new SelectList(_db.Set<Category>(), "Id", "Name", model.CategoryId);
+            return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         // GET: Books/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Book == null)
+            if (id == null || _db.Book == null)
             {
                 return NotFound();
             }
 
-            var book = await _context.Book
+            var book = await _db.Book
                 .Include(b => b.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (book == null)
@@ -146,23 +183,54 @@ namespace ASM_1670.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Book == null)
+            try
             {
-                return Problem("Entity set 'ApplicationDbContext.Book'  is null.");
+                var books = await _db.Book.FindAsync(id);
+                if (books == null)
+                {
+                    return NotFound();
+                }
+
+                // Delete the profile picture file if it exists
+                if (!string.IsNullOrEmpty(books.Picture))
+                {
+                    var imagePath = Path.Combine(webHostEnvironment.WebRootPath, "images", books.Picture);
+                    if (System.IO.File.Exists(imagePath))
+                    {
+                        System.IO.File.Delete(imagePath);
+                    }
+                }
+
+                _db.Book.Remove(books);
+                await _db.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            var book = await _context.Book.FindAsync(id);
-            if (book != null)
+            catch (Exception ex)
             {
-                _context.Book.Remove(book);
+                Console.WriteLine($"Error in DeleteConfirmed action: {ex.Message}");
+                TempData["ErrorMessage"] = "Error deleting product.";
+                return RedirectToAction(nameof(Index));
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
+        private string UploadedFile(Book model)
+        {
+            string uniqueFileName = null;
+            if (model.Image != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "images");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Image.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.Image.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
+        }
         private bool BookExists(int id)
         {
-          return (_context.Book?.Any(e => e.Id == id)).GetValueOrDefault();
+          return (_db.Book?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
