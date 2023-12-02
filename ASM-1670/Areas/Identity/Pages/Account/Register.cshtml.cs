@@ -110,6 +110,7 @@ namespace ASM_1670.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
@@ -121,6 +122,12 @@ namespace ASM_1670.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    // Tìm lại người dùng từ cơ sở dữ liệu để có thông tin cập nhật
+                    user = await _userManager.FindByEmailAsync(Input.Email);
+
+                    // Gán vai trò "Customer" cho người dùng mới
+                    await _userManager.AddToRoleAsync(user, "Customer");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
