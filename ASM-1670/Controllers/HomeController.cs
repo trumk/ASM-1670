@@ -49,7 +49,6 @@ namespace ASM_1670.Controllers
         }
 
 
-
         private List<Book> GetAllProducts()
         {
             return _db.Book.Include(b => b.Category).ToList(); 
