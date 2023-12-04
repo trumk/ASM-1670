@@ -1,73 +1,69 @@
-﻿@model ASM_1670.Models.CategoryViewModel
+﻿@model List<ASM_1670.Models.Book>
 @{
     ViewData["Title"] = "Home Page";
 }
 
 <style>
-    .List-book {
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+    .pagination {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        margin: -10px; /* Negative margin to create space between items */
+        justify-content: center;
     }
 
-    .product-card {
-        flex: 0 0 calc(30% - 20px); /* Adjust the width to fit three items per row */
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 16px;
-        margin: 10px; /* Adjust the margin to create space between items */
-        text-align: center;
-    }
-
-    .product-card img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 4px;
-    }
-
-    .product-card .title {
-        display: block;
-        margin-top: 8px;
-        font-weight: bold;
-        text-decoration: none; 
-    }
-
-    .product-card .title a {
-        color: inherit; 
-    }
-
-    .product-card .addBook {
-        display: inline-block;
-        margin-top: 8px;
-        padding: 8px 16px;
-        background-color: midnightblue;          
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
+    .page-count {
+        font-size: 16px;
+        color: #000;
     }
 </style>
 
-<form asp-controller="Home" asp-action="Index" method="get">
-    <p>
-        <select asp-for="BookCategory" asp-items="Model.Categories">
-            <option value="">All</option>
-        </select>
-        Title: <input type="text" name="searchString" />
-        <input type="submit" value="Filter" />
-    </p>
-</form>
+@using (Html.BeginForm("Index", "Home", FormMethod.Get))
+{
+    <label for="category">Filter by Category:</label>
+    <select name="category" id="category">
+        <option value="">All Categories</option>
+        <!-- Add options dynamically based on your categories -->
+        @foreach (var category in ViewBag.Categories)
+        {
+            <option value="@category.Id">@category.Name</option>
+        }
+    </select>
+    <input type="submit" value="Filter" />
+}
 
 
-
-<div class="List-book">
-    @foreach (var item in ViewBag.Book)
-    {
-        <div class="product-card">
-            <a asp-action="Detail" asp-route-id="@item.Id"><img src="/images/@item.Picture" class="img-responsive" width="200" height="200" /></a>
-            <span class="title"><a asp-action="Detail" asp-route-id="@item.Id">@item.Title</a></span>
-            <span class="title">@item.Author</span>
-            <a asp-controller="Home" asp-action="AddCart" asp-route-id="@item.Id" class="addBook">Add to Cart</a>
-        </div>
-    }
+<div class="container">
+    <div class="row">
+        @foreach (var item in ViewBag.Book)
+        {
+            <div class="col-md-3">
+                <div class="card mt-2">
+                    <div class="bg-image hover-zoom ripple ripple-surface ripple-surface-light"
+                         data-mdb-ripple-color="light">
+                        <a asp-controller="Home" asp-action="Detail" asp-route-id="@item.Id">
+                            <img src="/images/@item.Picture"
+                                 class="w-100" />
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <a asp-controller="Home" asp-action="Detail" asp-route-id="@item.Id" class="text-reset">
+                            <h5 class="card-title mb-3">@item.Title</h5>
+                        </a>
+                        <a href="" class="text-reset">
+                            <p>@item.Author</p>
+                        </a>
+                        <h6 class="mb-3">Price: $@item.Price</h6>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
+    

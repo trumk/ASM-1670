@@ -19,33 +19,27 @@ namespace ASM_1670.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(string bookCategory, string searchString)
+        public IActionResult Index(int category)
         {
-            Debug.WriteLine($"bookCategory: {bookCategory}, searchString: {searchString}");
-            IQueryable<string> catQuery = _db.Book.Select(b => b.Category.Name).Distinct();
+            var books = GetAllProducts();
+            var categories = GetCategories();
+            ViewBag.Categories = categories;
 
-            var books = from m in _db.Book select m;
-
-            if (!String.IsNullOrEmpty(searchString))
+            if (category > 0)
             {
-                books = books.Where(s => s.Title.Contains(searchString));
+                books = books.Where(b => b.CategoryId == category).ToList();
             }
 
-            if (!String.IsNullOrEmpty(bookCategory))
-            {
-                books = books.Where(s => s.Category.Name == bookCategory);
-            }
+            ViewBag.Book = books;
+            return View();
+        }
 
-            ViewBag.Book = GetAllProducts();
 
-            var categoryVM = new CategoryViewModel
-            {
-                Categories = new SelectList(catQuery.Distinct().ToList()),
-                BookCategory = bookCategory,
-                Books = books.ToList()
-            };
+        private List<Category> GetCategories()
+        {
+            var categories = _db.Category.ToList();
 
-            return View(categoryVM);
+            return categories;
         }
 
 
