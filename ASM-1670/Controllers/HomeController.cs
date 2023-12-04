@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using X.PagedList;
 
 namespace ASM_1670.Controllers
 {
@@ -19,33 +20,36 @@ namespace ASM_1670.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(int category, string searchTitle)
+        public IActionResult Index(int category, string searchTitle, int? page)
         {
-            var books = GetAllProducts();
             var categories = GetCategories();
-            ViewBag.Categories = categories;
+            var pageNumber = page ?? 1;
+            var pageSize = 8;
 
-            // Apply title search within the selected category or across all categories
+            // Assuming _db.Book is of type DbSet<ASM_1670.Models.Book>
+            var books = _db.Book.Include(b => b.Category).AsQueryable();
+
+            // Apply category filter
+            if (category > 0)
+            {
+                books = books.Where(b => b.CategoryId == category);
+            }
+
+            // Apply title search
             if (!string.IsNullOrEmpty(searchTitle))
             {
-                books = books.Where(b =>
-                    (category == 0 || b.CategoryId == category) &&
-                    b.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
-            }
-            else if (category > 0)
-            {
-                // Apply category filter if title search is not performed
-                books = books.Where(b => b.CategoryId == category).ToList();
+                books = books.Where(b => b.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
             }
 
-            ViewBag.Book = books;
+            // Convert the result to IPagedList
+            var pagedList = books.ToPagedList(pageNumber, pageSize);
+
+            ViewBag.Categories = categories;
+            ViewBag.Book = pagedList;
             ViewBag.SearchTitle = searchTitle; // Remember to set ViewBag.SearchTitle
 
             return View();
         }
-
-
 
 
 
@@ -57,10 +61,10 @@ namespace ASM_1670.Controllers
         }
 
 
-        private List<Book> GetAllProducts()
-        {
-            return _db.Book.Include(b => b.Category).ToList(); 
-        }
+        //private List<Book> GetAllProducts()
+        //{
+        //    return _db.Book.Include(b => b.Category).ToList(); 
+        //}
 
         public Book GetDetailProduct(int id)
         {
