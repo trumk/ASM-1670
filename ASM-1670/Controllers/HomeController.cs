@@ -26,29 +26,25 @@ namespace ASM_1670.Controllers
             var pageNumber = page ?? 1;
             var pageSize = 8;
 
-            // Assuming _db.Book is of type DbSet<ASM_1670.Models.Book>
             var books = _db.Book.Include(b => b.Category).AsQueryable();
 
-            // Apply category filter
             if (category > 0)
             {
                 books = books.Where(b => b.CategoryId == category);
             }
 
-            // Apply title search
             if (!string.IsNullOrEmpty(searchTitle))
             {
                 books = books.Where(b => b.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
             }
 
-            // Convert the result to IPagedList
             var pagedList = books.ToPagedList(pageNumber, pageSize);
 
             ViewBag.Categories = categories;
             ViewBag.Book = pagedList;
-            ViewBag.SearchTitle = searchTitle; // Remember to set ViewBag.SearchTitle
+            ViewBag.SearchTitle = searchTitle; 
 
-            return View();
+            return View(pagedList);
         }
 
 

@@ -76,6 +76,7 @@
 <div class="container pagination">
     <div class="row">
         <div class="col-md-12">
+            <span class="page-count">Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount</span>
             @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
         </div>
     </div>
