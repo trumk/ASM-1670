@@ -24,7 +24,7 @@
     }
 </style>
 
-@using (Html.BeginForm("Index", "Home", FormMethod.Get))
+@using (Html.BeginForm("Index", "Home", FormMethod.Post))
 {
     <label for="category">Filter by Category:</label>
     <select name="category" id="category">
@@ -35,8 +35,14 @@
             <option value="@category.Id">@category.Name</option>
         }
     </select>
+
+    <label for="searchTitle">Search by Title:</label>
+    <input type="text" name="searchTitle" id="searchTitle" value="@ViewBag.SearchTitle" />
+
     <input type="submit" value="Filter" />
 }
+
+
 
 
 <div class="container">

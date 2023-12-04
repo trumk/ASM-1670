@@ -19,20 +19,34 @@ namespace ASM_1670.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index(int category)
+        public IActionResult Index(int category, string searchTitle)
         {
             var books = GetAllProducts();
             var categories = GetCategories();
             ViewBag.Categories = categories;
 
-            if (category > 0)
+            // Apply title search within the selected category or across all categories
+            if (!string.IsNullOrEmpty(searchTitle))
             {
+                books = books.Where(b =>
+                    (category == 0 || b.CategoryId == category) &&
+                    b.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+            else if (category > 0)
+            {
+                // Apply category filter if title search is not performed
                 books = books.Where(b => b.CategoryId == category).ToList();
             }
 
             ViewBag.Book = books;
+            ViewBag.SearchTitle = searchTitle; // Remember to set ViewBag.SearchTitle
+
             return View();
         }
+
+
+
 
 
         private List<Category> GetCategories()

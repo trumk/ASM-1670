@@ -11,24 +11,50 @@
 <script src="~/js/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
-        $(".updateCart").click(function (event) {
-            event.preventDefault();
-            var quantity = $(".quantity_" + $(this).attr("data-id")).val();
-            console.log(quantity);
+        $('.updateCart').click(function (e) {
+            e.preventDefault();
+
+            var productId = $(this).data('id');
+            var quantity = $('.quantity_' + productId).val();
+
+            console.log('Updating quantity for product ID:', productId, 'to quantity:', quantity);
+
+            // Make an AJAX request to update the quantity
             $.ajax({
-                type: "POST",
-                url: "@Url.Action("updateCart", "Products")",
-                data: {
-                    id: $(this).attr("data-id"),
-                    quantity: quantity
+                type: 'POST',
+                url: '/Cart/UpdateCart', // Update the URL to match your controller action
+                data: { id: productId, quantity: quantity },
+                success: function (data) {
+                    console.log('Quantity updated successfully:', data);
+                    // Optionally, update the total or any other UI elements
                 },
-                success: function (result) {
-                    window.location.href = '@Url.Action("ListCart", "Products")';
+                error: function () {
+                    alert('Error updating quantity');
+                }
+            });
+        });
+
+        $('.deleteCart').click(function (e) {
+            e.preventDefault();
+
+            var productId = $(this).data('id');
+
+            // Make an AJAX request to delete the item
+            $.ajax({
+                type: 'POST',
+                url: '/Cart/DeleteItem', // Change the URL to match your controller action
+                data: { productId: productId },
+                success: function () {
+                    // Optionally, remove the row or update the UI
+                },
+                error: function () {
+                    alert('Error deleting item');
                 }
             });
         });
     });
 </script>
+
 
 @if (ViewBag.carts != null && ViewBag.carts.Count > 0)
 {
