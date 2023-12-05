@@ -48,11 +48,9 @@ namespace ASM_1670.Controllers
         }
 
 
-
         private List<Category> GetCategories()
         {
             var categories = _db.Category.ToList();
-
             return categories;
         }
 
