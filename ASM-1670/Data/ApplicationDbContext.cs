@@ -11,6 +11,8 @@ namespace ASM_1670.Data
         {
         }
         public DbSet<ASM_1670.Models.Book> Book { get; set; } = default!;
-        public DbSet<ASM_1670.Models.Category> Category { get; set; } = default!;
+        public DbSet<ASM_1670.Models.Category> Category { get; set; } = default!;   
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
     }
 }

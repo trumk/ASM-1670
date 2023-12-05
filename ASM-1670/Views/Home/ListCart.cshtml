@@ -8,7 +8,7 @@
         padding: 10px;
     }
 </style>
-<script src="~/js/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     $(document).ready(function () {
         $(".updateCart").click(function (event) {
@@ -17,18 +17,19 @@
             console.log(quantity);
             $.ajax({
                 type: "POST",
-                url: "@Url.Action("updateCart", "Products")",
+                url: "/Products/updateCart",  // Update the URL to match your controller action
                 data: {
                     id: $(this).attr("data-id"),
                     quantity: quantity
                 },
                 success: function (result) {
-                    window.location.href = '@Url.Action("ListCart", "Products")';
+                    window.location.href = '/Products/ListCart';  // Update the URL to match your controller action
                 }
             });
         });
     });
 </script>
+
 
     <div class="List-cart">
         <table>
@@ -63,5 +64,31 @@
             }
         </table>
     </div>
+<div>
+    <a id="orderNow" href="@Url.Action("CreateOrder", "Orders")" class="btn btn-success">Order Now</a>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        console.log('Script executed'); 
+        $("#orderNow").click(function (event) {
+            event.preventDefault();
+            console.log('Order button clicked');
+
+            $.ajax({
+                type: "POST",
+                url: "/Orders/CreateOrder",
+                success: function () {
+                    window.location.href = '/Home/Index';
+                },
+                error: function () {
+                    alert('Error creating order');
+                }
+            });
+        });
+    });
+
+</script>
 
 
