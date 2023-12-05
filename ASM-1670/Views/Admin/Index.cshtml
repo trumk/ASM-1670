@@ -1,8 +1,13 @@
 ﻿@model List<Order>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<a asp-action="User">Users</a>
-<a asp-action="Order">Orders</a>
+    <a asp-controller="Categories" asp-action="Index">Manage Categories</a>
+    <a asp-controller="Books" asp-action="Index">Manage Books</a>
+    <a asp-action="User">Manage Users</a>
+    <a asp-action="Order">Manage Orders</a>
+
+
+
 
