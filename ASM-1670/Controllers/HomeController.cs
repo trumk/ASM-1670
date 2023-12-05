@@ -35,17 +35,20 @@ namespace ASM_1670.Controllers
 
             if (!string.IsNullOrEmpty(searchTitle))
             {
-                books = books.Where(b => b.Title.Contains(searchTitle, StringComparison.OrdinalIgnoreCase));
+                // Convert searchTitle to lowercase (or uppercase) for case-insensitive comparison
+                var searchTitleLower = searchTitle.ToLower();
+                books = books.Where(b => b.Title.ToLower().Contains(searchTitleLower));
             }
 
             var pagedList = books.ToPagedList(pageNumber, pageSize);
 
             ViewBag.Categories = categories;
             ViewBag.Book = pagedList;
-            ViewBag.SearchTitle = searchTitle; 
+            ViewBag.SearchTitle = searchTitle;
 
             return View(pagedList);
         }
+
 
 
         private List<Category> GetCategories()
