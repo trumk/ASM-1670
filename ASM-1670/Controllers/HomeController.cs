@@ -196,6 +196,10 @@ namespace ASM_1670.Controllers
         {
             return View();
         }
+        public IActionResult SuccessfullyOrder()
+        {
+            return View();
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

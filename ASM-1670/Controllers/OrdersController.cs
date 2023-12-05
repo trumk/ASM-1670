@@ -33,7 +33,6 @@ namespace ASM_1670.Controllers
                 {
                     var dataCart = JsonConvert.DeserializeObject<List<Cart>>(cart);
 
-                    // Create a new order
                     Order order = new Order
                     {
                         UserId = user.Id,
@@ -46,26 +45,21 @@ namespace ASM_1670.Controllers
                         }).ToList()
                     };
 
-                    // Save the new order to the database
+                
                     _dbContext.Orders.Add(order);
                     _dbContext.SaveChanges();
 
-                    // Clear the cart session
                     HttpContext.Session.Remove("cart");
 
-                    return RedirectToAction("Index", "Home"); // Redirect to a confirmation page or another appropriate action
+                    return RedirectToAction("Index", "Home"); 
                 }
                 else
                 {
-                    // Handle the case where the user is not found (not logged in)
-                    // You may redirect to a login page or take appropriate action
                     return RedirectToAction("Login", "Account");
                 }
             }
             else
             {
-                // Handle the case where the cart is empty
-                // You may redirect to the cart page or take appropriate action
                 return RedirectToAction("ListCart", "Products");
             }
         }
