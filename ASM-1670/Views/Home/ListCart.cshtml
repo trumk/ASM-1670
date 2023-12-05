@@ -61,7 +61,7 @@
                         <td>@counter</td>
                         <td><img src="~/images/@item.Product.Picture" width="120" height="200" /></td>
                         <td>@item.Product.Title</td>
-                        <td><input type="number" class="@txt_class" value="@item.Quantity" /></td>
+                        <td><input type="number" class="@txt_class" value="@item.Quantity" min="1" /></td>
                         <td>$@item.Product.Price</td>
                         <td>$@total</td>
                         <td><a href="" data-id="@item.Product.Id" class="updateCart">Update</a></td>
