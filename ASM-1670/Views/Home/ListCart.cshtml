@@ -8,26 +8,34 @@
         padding: 10px;
     }
 </style>
+<script src="~/js/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     $(document).ready(function () {
         $(".updateCart").click(function (event) {
             event.preventDefault();
             var quantity = $(".quantity_" + $(this).attr("data-id")).val();
-            console.log(quantity);
+            console.log('Quantity:', quantity);
+
             $.ajax({
                 type: "POST",
-                url: "/Products/updateCart",  
+                url: "/Products/updateCart",
                 data: {
                     id: $(this).attr("data-id"),
                     quantity: quantity
                 },
                 success: function (result) {
-                    window.location.href = '/Products/ListCart';  
+                    console.log('Update successful');
+                    window.location.href = '/Products/ListCart';
+                },
+                error: function () {
+                    console.error('Error updating cart');
+                    alert('Error updating cart');
                 }
             });
         });
     });
+
 </script>
 
 
