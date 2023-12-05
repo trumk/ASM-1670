@@ -17,13 +17,13 @@
             console.log(quantity);
             $.ajax({
                 type: "POST",
-                url: "/Products/updateCart",  // Update the URL to match your controller action
+                url: "/Products/updateCart",  
                 data: {
                     id: $(this).attr("data-id"),
                     quantity: quantity
                 },
                 success: function (result) {
-                    window.location.href = '/Products/ListCart';  // Update the URL to match your controller action
+                    window.location.href = '/Products/ListCart';  
                 }
             });
         });
