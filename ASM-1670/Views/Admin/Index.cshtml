@@ -3,11 +3,24 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
+<style>
+    body > div > main > div > a {
+        display: inline-block;
+        padding: 10px 15px;
+        margin: 5px;
+        text-decoration: none;
+        color: #fff;
+        background-color: #3498db; 
+        border: 1px solid #2980b9; 
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+
+</style>
+
+<div class="manage">
     <a asp-controller="Categories" asp-action="Index">Manage Categories</a>
     <a asp-controller="Books" asp-action="Index">Manage Books</a>
     <a asp-action="User">Manage Users</a>
     <a asp-action="Order">Manage Orders</a>
-
-
-
-
+</div>

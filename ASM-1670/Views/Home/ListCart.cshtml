@@ -80,7 +80,7 @@
                         <td><input type="number" class="@txt_class" value="@item.Quantity" min="1" /></td>
                         <td>$@item.Product.Price</td>
                         <td>$@total</td>
-                        <td><a data-id="@item.Product.Id" class="updateCart">Update</a></td>
+                        <td><a href="" data-id="@item.Product.Id" class="updateCart">Update</a></td>
                         <td><a asp-controller="Home" asp-action="deleteCart" asp-route-id="@item.Product.Id">Delete</a></td>
                     </tr>
                 }
@@ -110,6 +110,5 @@
             });
         });
     });
-
 </script>
 
