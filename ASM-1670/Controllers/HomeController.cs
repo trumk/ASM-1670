@@ -132,7 +132,40 @@ namespace ASM_1670.Controllers
             return BadRequest();
 
         }
+        public IActionResult AddMore(int id)
+        {
+            var cart = HttpContext.Session.GetString("cart");
 
+            List<Cart> dataCart = JsonConvert.DeserializeObject<List<Cart>>(cart);
+            for (int i = 0; i < dataCart.Count; i++)
+            {
+                if (dataCart[i].Product != null && dataCart[i].Product.Id == id)
+                {
+                    dataCart[i].Quantity++;
+                }
+            }
+            HttpContext.Session.SetString("cart", JsonConvert.SerializeObject(dataCart));
+            return RedirectToAction("ListCart");
+        }
+        public IActionResult ReduceOne(int id)
+        {
+            var cart = HttpContext.Session.GetString("cart");
+            List<Cart> dataCart = JsonConvert.DeserializeObject<List<Cart>>(cart);
+            for (int i = 0; i < dataCart.Count; i++)
+            {
+                if (dataCart[i].Product != null && dataCart[i].Product.Id == id)
+                {
+                    if (dataCart[i].Quantity >= 2)
+                        dataCart[i].Quantity--;
+                    else
+                    {
+                        dataCart.RemoveAt(i);
+                    }
+                }
+            }
+            HttpContext.Session.SetString("cart", JsonConvert.SerializeObject(dataCart));
+            return RedirectToAction("ListCart");
+        }
         public IActionResult DeleteCart(int id)
         {
             var cart = HttpContext.Session.GetString("cart");

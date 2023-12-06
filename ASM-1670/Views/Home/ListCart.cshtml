@@ -7,6 +7,29 @@
     td, th {
         padding: 10px;
     }
+
+    .button-container form {
+        display: inline-block;
+        margin-right: 10px; 
+    }
+
+    .circle-button {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+    }
+
+    .green-button {
+        background-color: gray;
+        color: white;
+    }
+
+    .red-button {
+        background-color: gray;
+        color: white;
+    }
 </style>
 <script src="~/js/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -64,7 +87,16 @@
                         <td><input type="number" class="@txt_class" value="@item.Quantity" min="1" /></td>
                         <td>$@item.Product.Price</td>
                         <td>$@total</td>
-                        <td><a href="" data-id="@item.Product.Id" class="updateCart">Update</a></td>
+                    <td>
+                        <div class="button-container">
+                            <form asp-controller="Home" asp-action="AddMore" asp-route-id="@item.Product.Id" method="post">
+                                <button class="circle-button green-button" type="submit">+</button>
+                            </form>
+                            <form asp-controller="Home" asp-action="ReduceOne" asp-route-id="@item.Product.Id" method="post">
+                                <button class="circle-button red-button" type="submit">-</button>
+                            </form>
+                        </div>
+                    </td> 
                         <td><a asp-controller="Home" asp-action="deleteCart" asp-route-id="@item.Product.Id">Delete</a></td>
                     </tr>
                 }
