@@ -4,11 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthentication().AddGoogle(googleOptions =>
-{
-    googleOptions.ClientId = "975794190708-pj7bo8he382ebl741h1e69ef5v1intnh.apps.googleusercontent.com";
-    googleOptions.ClientSecret = "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";
-});
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
