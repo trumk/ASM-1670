@@ -38,27 +38,20 @@
         $(".updateCart").click(function (event) {
             event.preventDefault();
             var quantity = $(".quantity_" + $(this).attr("data-id")).val();
-            console.log('Quantity:', quantity);
-
+            console.log(quantity);
             $.ajax({
                 type: "POST",
-                url: "/Products/updateCart",
+                url: "@Url.Action("updateCart","Home")",
                 data: {
                     id: $(this).attr("data-id"),
                     quantity: quantity
                 },
                 success: function (result) {
-                    console.log('Update successful');
-                    window.location.href = '/Products/ListCart';
-                },
-                error: function () {
-                    console.error('Error updating cart');
-                    alert('Error updating cart');
+                    window.location.href = '@Url.Action("ListCart","Home")';
                 }
             });
         });
     });
-
 </script>
 
     <div class="List-cart">
@@ -87,16 +80,7 @@
                         <td><input type="number" class="@txt_class" value="@item.Quantity" min="1" /></td>
                         <td>$@item.Product.Price</td>
                         <td>$@total</td>
-                    <td>
-                        <div class="button-container">
-                            <form asp-controller="Home" asp-action="AddMore" asp-route-id="@item.Product.Id" method="post">
-                                <button class="circle-button green-button" type="submit">+</button>
-                            </form>
-                            <form asp-controller="Home" asp-action="ReduceOne" asp-route-id="@item.Product.Id" method="post">
-                                <button class="circle-button red-button" type="submit">-</button>
-                            </form>
-                        </div>
-                    </td> 
+                        <td><a data-id="@item.Product.Id" class="updateCart">Update</a></td>
                         <td><a asp-controller="Home" asp-action="deleteCart" asp-route-id="@item.Product.Id">Delete</a></td>
                     </tr>
                 }
