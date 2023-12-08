@@ -71,6 +71,7 @@ namespace ASM_1670.Controllers
             var books = _db.Book.Find(id);
             return books;
         }
+        [Authorize(Roles = "Admin, Customer")]
         public async Task<IActionResult> ViewOrder()
         {
             var user = await _userManager.GetUserAsync(User);
