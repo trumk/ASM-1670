@@ -1,6 +1,7 @@
 ﻿using ASM_1670.Data;
 using ASM_1670.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,12 @@ namespace ASM_1670.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ApplicationDbContext _db;
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db)
+        private readonly UserManager<IdentityUser> _userManager;
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext db, UserManager<IdentityUser> userManager)
         {
             this._db = db;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public IActionResult Index(int category, string searchTitle, int? page)
@@ -67,6 +70,23 @@ namespace ASM_1670.Controllers
         {
             var books = _db.Book.Find(id);
             return books;
+        }
+        public async Task<IActionResult> ViewOrder()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            List<Order> userOrders = new List<Order>();
+
+            if (user != null)
+            {
+                var userId = user.Id;
+                userOrders = _db.Orders
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Book)
+                    .Where(o => o.UserId == userId)
+                    .ToList();
+            }
+
+            return View(userOrders);
         }
         [Authorize(Roles = "Admin, Customer")]
         public IActionResult AddCart(int id)
