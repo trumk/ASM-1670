@@ -38,7 +38,6 @@ namespace ASM_1670.Controllers
 
             if (!string.IsNullOrEmpty(searchTitle))
             {
-                // Convert searchTitle to lowercase (or uppercase) for case-insensitive comparison
                 var searchTitleLower = searchTitle.ToLower();
                 books = books.Where(b => b.Title.ToLower().Contains(searchTitleLower));
             }
