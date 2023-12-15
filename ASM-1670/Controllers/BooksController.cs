@@ -106,7 +106,7 @@ namespace ASM_1670.Controllers
                 CategoryId = book.CategoryId 
             };
             ViewData["CategoryId"] = new SelectList(_db.Set<Category>(), "Id", "Name", book.CategoryId);
-            return View(book);
+            return View(bookEdit);
         }
 
         // POST: Books/Edit/5
