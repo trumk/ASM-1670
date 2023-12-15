@@ -60,11 +60,6 @@ namespace ASM_1670.Controllers
         }
 
 
-        //private List<Book> GetAllProducts()
-        //{
-        //    return _db.Book.Include(b => b.Category).ToList(); 
-        //}
-
         public Book GetDetailProduct(int id)
         {
             var books = _db.Book.Find(id);
