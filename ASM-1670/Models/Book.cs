@@ -16,3 +16,4 @@ namespace ASM_1670.Models
         public IFormFile Image { get; set; }
     }
 }
+
